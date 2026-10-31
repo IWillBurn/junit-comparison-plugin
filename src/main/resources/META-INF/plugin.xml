@@ -1,0 +1,49 @@
+<idea-plugin>
+    <id>org.atpfivt.comparison.tree</id>
+    <name>Comparison Tree</name>
+    <vendor>atpfivt</vendor>
+    <description><![CDATA[
+    Shows the invocations of a <code>@ParameterizedClass</code> as leaves under each test in the JUnit results tree:
+    <code>class &gt; method &gt; [argument set] &gt; implementation</code> instead of
+    <code>class &gt; implementation &gt; method &gt; [argument set]</code>, for the classes and tests marked with
+    <code>@org.atpfivt.comparison.ComparisonTree</code>. Prototype with two ways to hook into the IDE:
+    <ul>
+      <li>(a) the run configuration type <b>JUnit (comparison tree)</b>;</li>
+      <li>(b) ordinary JUnit run configurations, switched by <b>Run | Comparison Tree for JUnit Runs</b>.</li>
+    </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.java</depends>
+    <depends>JUnit</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- approach (a) -->
+        <configurationType implementation="org.atpfivt.comparison.intellij.configuration.ComparisonConfigurationType"/>
+        <runConfigurationProducer
+                implementation="org.atpfivt.comparison.intellij.configuration.ComparisonConfigurationProducer"/>
+        <runLineMarkerContributor language="JAVA"
+                implementationClass="org.atpfivt.comparison.intellij.configuration.ComparisonRunLineMarkerContributor"/>
+    </extensions>
+
+    <extensions defaultExtensionNs="com.intellij.java">
+        <!-- approach (b) -->
+        <consoleDecorator implementation="org.atpfivt.comparison.intellij.console.TransposingConsoleDecorator"/>
+    </extensions>
+
+    <actions>
+        <!-- approach (a): in the menu of the gutter icon of tests, see ComparisonRunLineMarkerContributor -->
+        <action id="org.atpfivt.comparison.tree.Run"
+                class="org.atpfivt.comparison.intellij.configuration.RunWithComparisonTreeAction"
+                text="Run with Comparison Tree"
+                description="Run with a JUnit (comparison tree) configuration"
+                icon="AllIcons.RunConfigurations.TestState.Run"/>
+        <!-- approach (b) -->
+        <action id="org.atpfivt.comparison.tree.Toggle"
+                class="org.atpfivt.comparison.intellij.console.ToggleComparisonTreeAction"
+                text="Comparison Tree for JUnit Runs"
+                description="Show @ParameterizedClass invocations as leaves in the results of ordinary JUnit runs">
+            <add-to-group group-id="RunMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
